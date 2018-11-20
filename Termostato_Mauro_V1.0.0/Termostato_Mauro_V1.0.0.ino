@@ -1,7 +1,7 @@
 //*****************************************************
 //
 // Data inizio 8/11/2018
-// Data ultima modifica 20/11/2018
+// Data ultima modfica 10/11/2018
 // Realizzato da Daniele loddo alias Ivotek
 // Contatti www.ivotek.it ivotek@gmail.com
 //
@@ -20,9 +20,9 @@
 // LCD D5 pin to digital pin 4
 // LCD D6 pin to digital pin 3
 // LCD D7 pin to digital pin 2
-// LCD RW pin to ground
+// LCD R/W pin to ground
 // LCD VSS pin to ground
-// LCD VDD pin to 5V
+// LCD VCC pin to 5V
 // 10K resistor: ends to +5V and ground
 // wiper to LCD VO pin (pin 3)
 //
@@ -58,13 +58,13 @@ void Stop ();
 
 
 //Prima temperatura
-const float firstTemp = 23 ;
+const float firstTemp = 70 ;
 //Seconda temperatura
-const float secondTemp = 25;
+const float secondTemp = 100;
 //Primo tempo
-const long firstTime = 5;
+const long firstTime = 30;
 //Secondo tempo
-const long secondTime = 10;
+const long secondTime = 30;
 //Relè per attivare la resistenza
 const int rele = 6;
 //Pulsante di start
@@ -85,7 +85,7 @@ void setup() {
   //Settaggi iniziali display
 
   //DEBUG
-  //Serial.begin(9600);
+  Serial.begin(9600);
 
   //Setto il numero di linne e colonne:
   lcd.begin(16, 2);
@@ -101,15 +101,15 @@ void setup() {
   pinMode(pulsStop, INPUT_PULLUP);
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio Setup");
-  //Serial.print("INFORMAZIONI: Prima temperatura impostata: ");
-  //Serial.println(firstTemp);
-  //Serial.print("INFORMAZIONI: Primo tempo impostato: ");
-  //Serial.println(firstTime);
-  //Serial.print("INFORMAZIONI: Seconda temperatura impostata: ");
-  //Serial.println(secondTemp);
-  //Serial.print("INFORMAZIONI: Secondo tempo impostato: ");
-  //Serial.println(secondTime);
+  Serial.println("INFORMAZIONI: Avvio Setup");
+  Serial.print("INFORMAZIONI: Prima temperatura impostata: ");
+  Serial.println(firstTemp);
+  Serial.print("INFORMAZIONI: Primo tempo impostato: ");
+  Serial.println(firstTime);
+  Serial.print("INFORMAZIONI: Seconda temperatura impostata: ");
+  Serial.println(secondTemp);
+  Serial.print("INFORMAZIONI: Secondo tempo impostato: ");
+  Serial.println(secondTime);
 
 }
 
@@ -141,7 +141,7 @@ void loop() {
 void HelloInit() {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio HelloInit");
+  Serial.println("INFORMAZIONI: Avvio HelloInit");
 
   //Cancello lo schermo
   lcd.clear();
@@ -157,7 +157,7 @@ void HelloInit() {
 void WaitStart() {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio WaitStart");
+  Serial.println("INFORMAZIONI: Avvio WaitStart");
 
   //Se il pulsante non è premuto rimango nel ciclo
   //A meno chè non venga premuto il pulsante di stop
@@ -178,7 +178,7 @@ void WaitStart() {
 void GoTemp(int temp) {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio GoTemp");
+  Serial.println("INFORMAZIONI: Avvio GoTemp");
 
   //Ciclo per il controllo della temperatura
 
@@ -199,7 +199,7 @@ void GoTemp(int temp) {
     //Attivo il relè
     digitalWrite(rele, HIGH);
     //DEBUG
-    //Serial.println("INFORMAZIONI: Relè attivo");
+    Serial.println("INFORMAZIONI: Relè attivo");
 
     //Controllo se ha premuto il pulsante di stop
     if (digitalRead(pulsStop) == LOW ){
@@ -213,26 +213,22 @@ void GoTemp(int temp) {
   //Finito il ciclo disattivo il relè
   digitalWrite(rele, LOW);
   //DEBUG
-  //Serial.println("INFORMAZIONI: Relè disattivo");
+  Serial.println("INFORMAZIONI: Relè disattivo");
+
 }
 
 //Tengo la temperatura per il tempo passato come parametro
 void KeepTime(int ktime, float temp) {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio KeepTime");
+  Serial.println("INFORMAZIONI: Avvio KeepTime");
 
   //Creo un ciclo per il tempo passato come parametro
-  
-  //Prendo il tempo attuale
-  float timenow = millis();
-
-  //DEBUG
-  //Serial.print("Informazioni: tempo calcolato ");
-  //Serial.println(timenow);
-  while (( ((millis() - timenow)/1000) < ktime) && (flgStop == false)) {
-    //DEBUG
-    //Serial.println("INFORMAZIONI: Entrato nel ciclo");
+  //Prendo il tempo
+  long timenow = millis();
+  //Converto il ktime da minuti a millisecondi
+  ktime = ktime * 1000 * 60;
+  while ((millis() - timenow ) < ktime && (flgStop == false)) {
     //Il tempo è minore quindi controllo la temperatura
     if (GetTemp() < temp) {
       //La temperatura è minore
@@ -247,7 +243,7 @@ void KeepTime(int ktime, float temp) {
       //Mi sposto alla colonna 0 riga 2
       lcd.setCursor(0, 2);
       //Invio il messaggio
-      lcd.print("tempo: ");
+      lcd.print("temperatura: ");
       lcd.print(ktime);
       lcd.print("sec");
     }
@@ -266,27 +262,27 @@ void KeepTime(int ktime, float temp) {
       //Invio il messaggio
       lcd.print("temperatura: ");
       lcd.print(ktime);
-      lcd.print("s");
+      lcd.print("sec");
     }
+  }
 
-    //Controllo se ha premuto il tasto stop
-    if (digitalRead(pulsStop) == LOW ){
+  //Finito il ciclo disattivo il relè
+  digitalWrite(rele, LOW);
+
+  //Controllo se ha premuto il tasto stop
+  if (digitalRead(pulsStop) == LOW ){
       //Setto la variabilea true
       flgStop = true;
       //Esco dalla funzione
       return;
     } 
-  }
-
-  //Finito il ciclo disattivo il relè
-  digitalWrite(rele, LOW);
 }
 
 //Fermo i processi
 void Stop () {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio Stop");
+  Serial.println("INFORMAZIONI: Avvio Stop");
 
   //Cancello lo schermo
   lcd.clear();
@@ -307,23 +303,20 @@ void Stop () {
     //Resetto la variabile d'emergenza
     flgStop = false;
   }
-
-  //Piccolo delay per leggere lo stato di stop
-  delay(500);
 }
 
 //Leggo e ritorno la temperatura
 float GetTemp() {
 
   //DEBUG
-  //Serial.println("INFORMAZIONI: Avvio GetTemp");
+  Serial.println("INFORMAZIONI: Avvio GetTemp");
 
   //Richiedo la temperatura al sensore
   sensors.requestTemperatures();
 
   //DEBUG
-  //Serial.print("INFORMAZIONI: Temperatura misurata = ");
-  //Serial.println(sensors.getTempCByIndex(0));
+  Serial.print("INFORMAZIONI: Temepratura misurata = ");
+  Serial.println(sensors.getTempCByIndex(0));
 
   //Ritorno la temperatura corrente
   return sensors.getTempCByIndex(0);
