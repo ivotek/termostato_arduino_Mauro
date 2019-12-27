@@ -69,7 +69,7 @@ const long secondTime = 30;
 const int rele = 6;
 //Pulsante di start
 const int pulsStart = 7;
-//Pulsante id stop
+//Pulsante di stop
 const int pulsStop = 8;
 //Sensore di temperatura
 const int DS18B20_Pin = 9;
@@ -77,7 +77,7 @@ const int DS18B20_Pin = 9;
 //Assegno il piedino per la comuncicazione one wire
 OneWire oneWire(DS18B20_Pin);
 
-//Specifico quale codifica deve essere fatta
+//Specifico quale codifica deve essere utilizzata
 DallasTemperature sensors(&oneWire);
 
 void setup() {
@@ -86,7 +86,7 @@ void setup() {
   //DEBUG
   Serial.begin(9600);
 
-  //Setto il numero di linne e colonne:
+  //Setto il numero di linee e colonne:
   lcd.begin(16, 2);
   // Stampo la scritta iniziliale
   lcd.print("ATTENDERE");
@@ -229,7 +229,7 @@ void KeepTime(int ktime, float temp) {
     }
     else
     {
-      //La temperatura è paggiore
+      //La temperatura è maggiore
       //Disattivo il relè
       digitalWrite(rele, LOW);
       //Aggiorno il display
@@ -265,7 +265,7 @@ void Stop () {
   //Invio il messaggio
   lcd.print("sistema");
 
-  //Controllo il perchè dello stop
+  //Controllo il perché dello stop
   //Se è un "emergenza" setto i flag
   //Sistemo le uscite
 
